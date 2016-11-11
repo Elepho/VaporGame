@@ -3,10 +3,10 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 
-
-
 public class RandomCubeSpawner : NetworkBehaviour {
     
+
+
     public float radius;
     public float length;
     public int NumberOfCubes;
@@ -18,21 +18,20 @@ public class RandomCubeSpawner : NetworkBehaviour {
 
     public GameObject TerrainCube;
 
+    [SyncVar]
+    public int seed;
 
-    public List<GameObject> CubeList = new List<GameObject>();
-
-    public void OnStartClient()
-    {
-        foreach(GameObject g in CubeList)
-        {
-            ClientScene.RegisterPrefab(g);
-        }
-    }
+    //OKAY NEW PLAN
+    //have the server generate the seed
+    //and send it to all the clients via RPC or syncvar so that they can make it themselves
 
     // Use this for initialization
     void Start () {
-        if (isServer)
-        {
+        Debug.Log("Starting Cube Spawner");
+        //if (isServer)
+        //{
+
+        Random.InitState(seed);
             MinMaxCubeWidth = SanitizeMinMax(MinMaxCubeWidth);
             MinMaxCubeHeight = SanitizeMinMax(MinMaxCubeHeight);
 
@@ -52,28 +51,18 @@ public class RandomCubeSpawner : NetworkBehaviour {
                 g.transform.localScale = scale;
                 g.transform.parent = transform;
                 
-                //NetworkServer.Spawn(g);
-                CubeList.Add(g);
+
                 //^^ this is throwing an error at the first one
                 // but still adds it to the list -_-
                 //figure out how to suppress the error so it goes through the whole thing
 
-                //still though, players should be given all the existent network identity objects when they spawn
-                //at least i think so
-                //so this workaround shouldn't be necessary anyway >:I
 
-                /*
-                RandomCube cube = new RandomCube();
-                cube.obj = g;
-                */
-
-                Debug.Log(string.Concat("Cube number ", n, "spawned"));
+                Debug.Log(string.Concat("Cube number ", n, " spawned"));
             }
 
 
             
-        }
-        //Network.Instantiate(TerrainCube, transform.position, Quaternion.Euler(0, 0, 0), 0);
+        //}
     }
 	
 	// Update is called once per frame
